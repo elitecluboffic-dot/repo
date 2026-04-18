@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import json
 from datetime import datetime
 
-BASE_URL = "https://tv10.lk21official.cc"
+BASE_URL = "https://tv.lk21official.love"
 PLAYER_BASE = "https://playeriframe.sbs/iframe/p2p/"
 
 
