@@ -1,0 +1,36 @@
+name: Auto Update Films
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Setiap 6 jam otomatis
+  workflow_dispatch:        # Bisa trigger manual di GitHub
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install cloudscraper beautifulsoup4
+
+      - name: Run scraper
+        run: python scrape.py
+
+      - name: Commit & push hasil scrape
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add movies.json direct_links.txt
+          git diff --cached --quiet || git commit -m "chore: auto update films $(date '+%Y-%m-%d %H:%M UTC')"
+          git push
