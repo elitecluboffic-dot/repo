@@ -1,6 +1,6 @@
 export async function onRequest(context) {
-  const referer = context.request.headers.get("Referer") || "";
-  if (!referer.includes("qqq-streaming.pages.dev")) {
+  const token = context.request.headers.get("X-API-Token") || "";
+  if (token !== context.env.API_SECRET) {
     return new Response(JSON.stringify({ error: "Forbidden" }), {
       status: 403,
       headers: { "Content-Type": "application/json" }
