@@ -171,13 +171,24 @@
 
 <script>
   const API = "/api/movies";
-
-  function _t() {
-    return atob("Tm9zdGFsZ2lhMjAwOQ==");
-  }
-
   const LIMIT = 50;
   let allMovies = [], filtered = [], page = 1, loading = false, currentSearch = "";
+
+  async function checkAuth() {
+    const res = await fetch(API + "?t=" + Date.now());
+    if (res.status === 401) {
+      document.getElementById('movie-grid').innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🔒</div>
+          <p>Login dengan Discord untuk menonton film</p>
+          <a href="/api/auth/login" style="display:inline-block;margin-top:16px;padding:10px 24px;background:#5865F2;color:#fff;border-radius:8px;text-decoration:none;font-weight:500;">
+            Login dengan Discord
+          </a>
+        </div>`;
+      return false;
+    }
+    return true;
+  }
 
   async function loadMovies(reset = false) {
     if (loading) return;
@@ -189,9 +200,12 @@
         '<div class="loading"><div class="spinner"></div> Memuat film...</div>';
     }
     try {
-      const res = await fetch(API + "?t=" + Date.now(), {
-        headers: { "X-API-Token": _t() }
-      });
+      const res = await fetch(API + "?t=" + Date.now());
+      if (res.status === 401) {
+        await checkAuth();
+        loading = false;
+        return;
+      }
       if (!res.ok) throw new Error("Gagal fetch");
       const data = await res.json();
       allMovies = data.movies || [];
@@ -206,7 +220,7 @@
       renderPage(true);
     } catch (err) {
       document.getElementById('movie-grid').innerHTML =
-        '<div class="empty-state"><div class="icon">⚠️</div><p>Gagal memuat data. Cek koneksi atau URL sumber.</p></div>';
+        '<div class="empty-state"><div class="icon">⚠️</div><p>Gagal memuat data.</p></div>';
     }
     loading = false;
   }
