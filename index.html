@@ -172,73 +172,66 @@
 <script>
   const API = "/api/movies";
 
+  function _t() {
+    const s = "<~:i^VdE,ol>@:c~>".replace(/^<~|~>$/g, "");
+    const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
+    let result = "", b = 0, n = 0;
+    for (let c of s) {
+      b = b * 85 + chars.indexOf(c);
+      if (++n === 5) {
+        for (let i = 3; i >= 0; i--) result += String.fromCharCode((b >> (i * 8)) & 0xFF);
+        b = n = 0;
+      }
+    }
+    return result.replace(/\0+$/, "");
+  }
+
   const LIMIT = 50;
-  let allMovies = [];
-  let filtered = [];
-  let page = 1;
-  let loading = false;
-  let currentSearch = "";
+  let allMovies = [], filtered = [], page = 1, loading = false, currentSearch = "";
 
   async function loadMovies(reset = false) {
     if (loading) return;
     loading = true;
-
     if (reset) {
-      page = 1;
-      allMovies = [];
-      filtered = [];
-      currentSearch = "";
+      page = 1; allMovies = []; filtered = []; currentSearch = "";
       document.getElementById('search').value = "";
       document.getElementById('movie-grid').innerHTML =
         '<div class="loading"><div class="spinner"></div> Memuat film...</div>';
     }
-
     try {
-      const res = await fetch(API + "?t=" + Date.now());
+      const res = await fetch(API + "?t=" + Date.now(), {
+        headers: { "X-API-Token": _t() }
+      });
       if (!res.ok) throw new Error("Gagal fetch");
       const data = await res.json();
-
       allMovies = data.movies || [];
       filtered = allMovies;
-
       document.getElementById('stat-total').textContent = data.total || allMovies.length;
       document.getElementById('header-count').textContent = (data.total || allMovies.length) + " film";
-
       if (data.last_updated) {
         const d = new Date(data.last_updated);
         document.getElementById('stat-updated').textContent =
           d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
       }
-
       renderPage(true);
-
     } catch (err) {
-      document.getElementById('movie-grid').innerHTML = `
-        <div class="empty-state">
-          <div class="icon">⚠️</div>
-          <p>Gagal memuat data. Cek koneksi atau URL sumber.</p>
-        </div>`;
+      document.getElementById('movie-grid').innerHTML =
+        '<div class="empty-state"><div class="icon">⚠️</div><p>Gagal memuat data. Cek koneksi atau URL sumber.</p></div>';
     }
-
     loading = false;
   }
 
   function renderPage(reset = false) {
     const grid = document.getElementById('movie-grid');
-
     const oldLoader = grid.querySelector('.load-more');
     if (oldLoader) oldLoader.remove();
-
     if (reset) grid.innerHTML = "";
-
     if (!filtered.length && reset) {
       grid.innerHTML = '<div class="empty-state"><div class="icon">🎬</div><p>Tidak ada film ditemukan.</p></div>';
       return;
     }
-
     const start = (page - 1) * LIMIT;
     const slice = filtered.slice(start, start + LIMIT);
-
     slice.forEach((m, i) => {
       const a = document.createElement("a");
       a.className = "card";
@@ -265,7 +258,6 @@
         </div>`;
       grid.appendChild(a);
     });
-
     const hasMore = start + LIMIT < filtered.length;
     if (hasMore) {
       const loader = document.createElement("div");
@@ -273,7 +265,6 @@
       loader.innerHTML = '<div class="spinner"></div>';
       grid.appendChild(loader);
     }
-
     page++;
   }
 
@@ -292,9 +283,7 @@
 
   window.addEventListener("scroll", () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 400) {
-      if (!loading && page * LIMIT <= filtered.length + LIMIT) {
-        renderPage();
-      }
+      if (!loading && page * LIMIT <= filtered.length + LIMIT) renderPage();
     }
   });
 
