@@ -172,19 +172,9 @@
 <script>
   const API = "/api/movies";
 
-function _t() {
-  const s = "PH%H{VQgn<VKOi<IRF3v";
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
-  let result = "", b = 0, n = 0;
-  for (let c of s) {
-    b = b * 85 + chars.indexOf(c);
-    if (++n === 5) {
-      for (let i = 3; i >= 0; i--) result += String.fromCharCode((b >> (i * 8)) & 0xFF);
-      b = n = 0;
-    }
+  function _t() {
+    return atob("Tm9zdGFsZ2lhMjAwOQ==");
   }
-  return result.replace(/\0+$/, "");
-}
 
   const LIMIT = 50;
   let allMovies = [], filtered = [], page = 1, loading = false, currentSearch = "";
