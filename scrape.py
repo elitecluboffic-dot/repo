@@ -5,60 +5,50 @@ import re
 import time
 from datetime import datetime
 
-# Daftar domain cadangan (update sesuai kondisi terkini)
 BASE_URLS = [
     "https://tv1.lk21official.love",
     "http://139.59.72.171",
     "https://bioskop2l.lk21.in.net",
-    "https://lk21official.pro",
-    "https://lk21official.my",
+    "https://tv10.lk21official.cc",
 ]
 
 PLAYER_DOMAIN = "https://playeriframe.sbs/iframe/p2p/"
-PLAYER_PARAMS = ["?player=3", "?player=2", "?player=1"]   # prioritas player=3 dulu
+PLAYER_PARAMS = ["?player=3", "?player=2", "?player=1"]
 
 def get_player_url(scraper, detail_url):
-    """Coba ambil player ID dari playeriframe.sbs, kalau gagal fallback ke ?player=3"""
     for attempt in range(3):
         try:
             res = scraper.get(detail_url, timeout=20)
             if res.status_code != 200:
                 continue
-
             soup = BeautifulSoup(res.text, "html.parser")
 
-            # Cara 1: Cari iframe playeriframe.sbs
-            iframes = soup.find_all("iframe")
-            for iframe in iframes:
+            # Cari iframe playeriframe.sbs
+            for iframe in soup.find_all("iframe"):
                 src = iframe.get("src", "") or iframe.get("data-src", "")
                 if "playeriframe.sbs" in src:
                     match = re.search(r"/iframe/p2p/([^/?&\"']+)", src)
                     if match:
-                        player_id = match.group(1)
-                        print(f"✅ player_id ditemukan: {player_id[:15]}...")
-                        return PLAYER_DOMAIN + player_id
+                        return PLAYER_DOMAIN + match.group(1)
 
-            # Cara 2: Cari di script tag
-            scripts = soup.find_all("script")
-            for script in scripts:
+            # Cari di script tag
+            for script in soup.find_all("script"):
                 text = script.string or ""
                 match = re.search(r"playeriframe\.sbs/iframe/p2p/([^/?&\"'\\s]+)", text)
                 if match:
-                    player_id = match.group(1)
-                    print(f"✅ player_id dari script: {player_id[:15]}...")
-                    return PLAYER_DOMAIN + player_id
+                    return PLAYER_DOMAIN + match.group(1)
 
         except Exception as e:
             print(f"   Attempt {attempt+1} gagal: {e}")
             time.sleep(2)
 
-    # Fallback ke ?player=3 (paling sering berhasil di mirror)
-    print(f"   ⚠️ Tidak menemukan player_id → fallback ke {PLAYER_PARAMS[0]}")
+    # Fallback
+    print(f"   ⚠️ Fallback ke player=3")
     return detail_url.rstrip("/") + PLAYER_PARAMS[0]
 
 
 def scrape_films():
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Mulai scrape LK21...")
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] Mulai scrape LK21 dengan pagination...")
 
     scraper = cloudscraper.create_scraper(
         browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False},
@@ -66,82 +56,78 @@ def scrape_films():
     )
 
     for base_url in BASE_URLS:
-        try:
-            print(f"→ Mencoba domain: {base_url}")
-            res = scraper.get(base_url, timeout=25)
+        movie_list = []
+        seen = set()
+        max_pages = 50   # Ubah jadi 10-12 kalau mau lebih banyak
 
-            if res.status_code != 200:
-                print(f"   Status: {res.status_code} → skip")
-                continue
+        print(f"→ Mencoba domain: {base_url}")
 
-            print(f"✅ Berhasil terkoneksi ke {base_url}")
-            soup = BeautifulSoup(res.text, "html.parser")
+        for page in range(1, max_pages + 1):
+            if page == 1:
+                url = base_url
+            else:
+                url = f"{base_url}/page/{page}/"     # pola umum pagination
 
-            # Selector utama (bisa berubah tergantung tema)
-            films = soup.select("a[itemprop='url'], article.item a, .gmr-box-content a")
+            try:
+                res = scraper.get(url, timeout=25)
+                if res.status_code != 200:
+                    print(f"   Halaman {page} → Status {res.status_code}, stop pagination")
+                    break
 
-            unique_films = []
-            seen = set()
+                soup = BeautifulSoup(res.text, "html.parser")
 
-            for film in films:
-                href = film.get("href", "").strip()
-                if not href or href == "#" or "/category/" in href or "/year/" in href:
-                    continue
+                # Selector yang lebih longgar (cocok untuk banyak tema LK21)
+                film_elements = soup.select("article.item, .gmr-box-content, .post, .item, div[class*='box'], a[href*='/']")
 
-                slug = href.strip("/").split("/")[-1]
-                if not slug or slug in seen:
-                    continue
-                seen.add(slug)
+                print(f"   Halaman {page}: menemukan {len(film_elements)} elemen potensial")
 
-                title_tag = film.select_one("h3.poster-title, h2, .entry-title")
-                title = title_tag.text.strip() if title_tag else "Unknown Title"
+                for element in film_elements:
+                    # Cari link detail
+                    link_tag = element.select_one("a[href]") or element
+                    href = link_tag.get("href", "").strip() if hasattr(link_tag, "get") else ""
 
-                year = film.select_one("span.year")
-                year = year.text.strip() if year else ""
+                    if not href or href == "#" or any(x in href for x in ["/category/", "/year/", "/tag/", "/author/"]):
+                        continue
 
-                rating = film.select_one("span[itemprop='ratingValue']")
-                rating = rating.text.strip() if rating else ""
+                    if href.startswith("http"):
+                        detail_url = href
+                    else:
+                        detail_url = base_url.rstrip("/") + "/" + href.strip("/")
 
-                poster = film.select_one("img[itemprop='image'], img")
-                poster = poster.get("src", "") if poster else ""
+                    slug = detail_url.strip("/").split("/")[-1]
+                    if not slug or slug in seen or len(slug) < 3:
+                        continue
+                    seen.add(slug)
 
-                # Buat detail URL
-                detail_url = href if href.startswith("http") else base_url.rstrip("/") + "/" + slug
+                    # Ambil judul
+                    title_tag = element.select_one("h2, h3, .entry-title, .gmr-title, .poster-title")
+                    title = title_tag.text.strip() if title_tag else slug.replace("-", " ").title()
 
-                unique_films.append({
-                    "title": title,
-                    "slug": slug,
-                    "year": year,
-                    "rating": rating,
-                    "poster": poster,
-                    "detail_url": detail_url,
-                })
+                    # Ambil poster
+                    img = element.select_one("img")
+                    poster = img.get("src", "") or img.get("data-src", "") if img else ""
 
-            if not unique_films:
-                print("   Tidak menemukan film di domain ini, coba domain lain...")
-                continue
+                    print(f"     → {title[:60]}...")
 
-            print(f"Ditemukan {len(unique_films)} film unik. Mengambil player...")
+                    player_url = get_player_url(scraper, detail_url)
 
-            # Step 2: Ambil player untuk tiap film
-            movie_list = []
-            for i, film in enumerate(unique_films, 1):
-                print(f" [{i}/{len(unique_films)}] {film['title'][:70]}...", end=" ", flush=True)
-                
-                player_url = get_player_url(scraper, film["detail_url"])
-                
-                movie_list.append({
-                    "title": film["title"],
-                    "slug": film["slug"],
-                    "year": film["year"],
-                    "rating": film["rating"],
-                    "poster": film["poster"],
-                    "player_url": player_url,
-                    "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                })
-                time.sleep(1.5)   # anti rate limit
+                    movie_list.append({
+                        "title": title,
+                        "slug": slug,
+                        "poster": poster,
+                        "player_url": player_url,
+                        "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    })
 
-            # Simpan hasil
+                time.sleep(2)  # jeda antar halaman
+
+            except Exception as e:
+                print(f"   Error halaman {page}: {e}")
+                break
+
+        if movie_list:
+            print(f"\n🎉 Berhasil scrape {len(movie_list)} film dari {base_url}")
+            
             with open("movies.json", "w", encoding="utf-8") as f:
                 json.dump({
                     "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -153,19 +139,14 @@ def scrape_films():
             with open("direct_links.txt", "w", encoding="utf-8") as f:
                 f.write(f"DAFTAR FILM LANGSUNG (Auto Update)\n")
                 f.write(f"Last update: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-                f.write(f"Domain: {base_url}\n")
-                f.write("=" * 80 + "\n\n")
-                for movie in movie_list:
-                    f.write(f"[{movie['title']}]({movie['player_url']})\n")
+                f.write(f"Domain: {base_url} | Halaman: 1-{max_pages}\n")
+                f.write("=" * 90 + "\n\n")
+                for m in movie_list:
+                    f.write(f"[{m['title']}]({m['player_url']})\n")
 
-            print(f"\n🎉 Berhasil update {len(movie_list)} film dari {base_url}")
             return True
 
-        except Exception as e:
-            print(f"   Error di {base_url}: {e}")
-            time.sleep(3)
-
-    print("❌ Semua domain gagal dicoba.")
+    print("❌ Semua domain gagal.")
     return False
 
 
