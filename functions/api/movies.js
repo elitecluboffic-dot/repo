@@ -1,11 +1,19 @@
 export async function onRequest(context) {
   const token = context.request.headers.get("X-API-Token") || "";
-  if (token !== context.env.API_SECRET) {
-    return new Response(JSON.stringify({ error: "Forbidden" }), {
+  const secret = context.env.API_SECRET || "";
+
+  if (token !== secret) {
+    return new Response(JSON.stringify({ 
+      error: "Forbidden",
+      debug_token: token,
+      debug_secret: secret,
+      debug_match: token === secret
+    }), {
       status: 403,
       headers: { "Content-Type": "application/json" }
     });
   }
+
   const API_URL = context.env.MOVIES_API_URL;
   if (!API_URL) {
     return new Response(JSON.stringify({ error: "MOVIES_API_URL tidak ada" }), {
