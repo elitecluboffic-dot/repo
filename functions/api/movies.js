@@ -1,13 +1,27 @@
 export async function onRequest(context) {
   const API_URL = context.env.MOVIES_API_URL;
-  
-  const res = await fetch(API_URL + "?t=" + Date.now());
-  const data = await res.json();
-  
-  return new Response(JSON.stringify(data), {
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
-    }
-  });
+
+  if (!API_URL) {
+    return new Response(JSON.stringify({ error: "MOVIES_API_URL tidak ada" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
+
+  try {
+    const res = await fetch(API_URL + "?t=" + Date.now());
+    const data = await res.json();
+
+    return new Response(JSON.stringify(data), {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*"
+      }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
 }
