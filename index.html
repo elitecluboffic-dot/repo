@@ -127,6 +127,9 @@
     #refresh-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; }
     #refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
 
+    #logout-btn { display: none; background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    #logout-btn:hover { border-color: var(--accent); color: var(--accent); }
+
     @media (max-width: 600px) {
       .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
       .hero { padding: 32px 16px 16px; }
@@ -141,6 +144,7 @@
     <span><span class="live-dot"></span> Live</span>
     <span id="header-count">— film</span>
     <button id="refresh-btn" onclick="loadMovies(true)">↻ Refresh</button>
+    <a href="/api/auth/logout" id="logout-btn">⏻ Logout</a>
   </div>
 </header>
 
@@ -166,7 +170,7 @@
 </div>
 
 <footer>
-  Auto-refresh setiap 30 menit &nbsp;·&nbsp; Data dari LK21
+  Auto-refresh setiap 30 menit &nbsp;·&nbsp; QQQ Streaming
 </footer>
 
 <script>
@@ -177,6 +181,7 @@
   async function checkAuth() {
     const res = await fetch(API + "?t=" + Date.now());
     if (res.status === 401) {
+      document.getElementById('logout-btn').style.display = 'none';
       document.getElementById('movie-grid').innerHTML = `
         <div class="empty-state">
           <div class="icon">🔒</div>
@@ -187,6 +192,7 @@
         </div>`;
       return false;
     }
+    document.getElementById('logout-btn').style.display = 'inline-block';
     return true;
   }
 
@@ -208,6 +214,7 @@
       }
       if (!res.ok) throw new Error("Gagal fetch");
       const data = await res.json();
+      document.getElementById('logout-btn').style.display = 'inline-block';
       allMovies = data.movies || [];
       filtered = allMovies;
       document.getElementById('stat-total').textContent = data.total || allMovies.length;
