@@ -6,7 +6,6 @@ export async function onRequest(context) {
       headers: { "Content-Type": "application/json" }
     });
   }
-
   const API_URL = context.env.MOVIES_API_URL;
   if (!API_URL) {
     return new Response(JSON.stringify({ error: "MOVIES_API_URL tidak ada" }), {
@@ -14,7 +13,6 @@ export async function onRequest(context) {
       headers: { "Content-Type": "application/json" }
     });
   }
-
   try {
     const res = await fetch(API_URL + "?t=" + Date.now());
     const data = await res.json();
