@@ -48,7 +48,7 @@ export async function onRequest(context) {
   }
 
   try {
-    // 1. Tukar code → access token
+    // 1. Tukar code → access token + refresh token
     const tokenRes  = await fetch("https://discord.com/api/oauth2/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -88,13 +88,14 @@ export async function onRequest(context) {
     }
     const member = await memberRes.json();
 
-    // 4. Buat JWT
+    // 4. Buat JWT — simpan refresh_token untuk auto-renew
     const jwt = await generateJWT({
-      id:       user.id,
-      username: user.username,
-      avatar:   user.avatar,
-      nick:     member.nick || user.global_name || user.username,
-      exp: Math.floor(Date.now() / 1000) + 604800
+      id:            user.id,
+      username:      user.username,
+      avatar:        user.avatar,
+      nick:          member.nick || user.global_name || user.username,
+      refresh_token: tokenData.refresh_token, // simpan untuk renew
+      exp:           Math.floor(Date.now() / 1000) + 604800 // 7 hari
     }, jwtSecret);
 
     // 5. Set cookie & redirect
