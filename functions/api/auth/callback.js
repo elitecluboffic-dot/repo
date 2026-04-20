@@ -94,7 +94,7 @@ export async function onRequest(context) {
       username: user.username,
       avatar:   user.avatar,
       nick:     member.nick || user.global_name || user.username,
-      exp:      Math.floor(Date.now() / 1000) + 86400
+      exp: Math.floor(Date.now() / 1000) + 604800
     }, jwtSecret);
 
     // 5. Set cookie & redirect
@@ -102,7 +102,7 @@ export async function onRequest(context) {
       status: 302,
       headers: {
         "Location":   `${BASE_URL}/`,
-        "Set-Cookie": `session=${jwt}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=86400`
+        "Set-Cookie": `session=${jwt}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800`
       }
     });
 
