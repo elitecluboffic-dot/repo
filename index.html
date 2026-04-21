@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="mul">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -114,21 +114,57 @@
     /* ─── CARD ─── */
     .card {
       background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-      overflow: hidden; transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s, background 0.25s;
-      cursor: pointer; text-decoration: none; color: inherit; display: block; animation: fadeUp 0.5s both;
+      overflow: hidden; cursor: pointer; text-decoration: none; color: inherit; display: block;
+      /* Ganti fadeUp animation → akan dihandle IntersectionObserver */
+      opacity: 0; transform: translateY(18px);
+      transition: opacity 0.4s ease, transform 0.4s ease,
+                  border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      will-change: transform, opacity;
     }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    /* Kelas yang ditambah observer saat card masuk viewport */
+    .card.in-view {
+      opacity: 1; transform: translateY(0);
+    }
     .card:hover { transform: translateY(-5px); border-color: rgba(230,57,70,0.5); box-shadow: 0 12px 40px rgba(230,57,70,0.18), 0 4px 12px rgba(0,0,0,0.4); background: var(--card-hover); }
+    /* Pastikan hover tetap terlihat setelah in-view */
+    .card.in-view:hover { opacity: 1; transform: translateY(-5px); }
+
     .card-poster { aspect-ratio: 2/3; background: var(--surface); position: relative; overflow: hidden; }
-    .card-poster img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; display: block; }
+
+    /* ─── IMAGE LAZY LOADING — skeleton shimmer ─── */
+    .card-poster img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+      /* Sembunyikan sampai gambar load */
+      opacity: 0;
+      transition: opacity 0.45s ease, transform 0.4s;
+    }
+    /* Shimmer placeholder sebelum gambar muncul */
+    .card-poster img.loaded { opacity: 1; }
+    .card-poster::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, var(--surface) 25%, #1c1c2e 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.6s infinite;
+      z-index: 0;
+      border-radius: 0;
+    }
+    /* Hapus shimmer setelah gambar selesai dimuat */
+    .card-poster.img-ready::before { display: none; }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
     .card:hover .card-poster img { transform: scale(1.07); }
-    .card-poster .no-poster { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 36px; background: linear-gradient(135deg, #13131f 0%, #1a1a2e 50%, #13131f 100%); }
-    .badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 5px; letter-spacing: 0.8px; text-transform: uppercase; backdrop-filter: blur(4px); }
+    .card-poster .no-poster { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 36px; background: linear-gradient(135deg, #13131f 0%, #1a1a2e 50%, #13131f 100%); position: relative; z-index: 1; }
+    .badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 5px; letter-spacing: 0.8px; text-transform: uppercase; backdrop-filter: blur(4px); z-index: 2; }
     .badge-default { background: rgba(230,57,70,0.85); color: #fff; }
     .badge-hd { background: rgba(46,204,113,0.85); color: #000; }
     .badge-cam { background: rgba(255,200,0,0.85); color: #000; }
-    .rating-badge { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); color: var(--gold); font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 5px; display: flex; align-items: center; gap: 4px; }
-    .play-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(230,57,70,0.9) 0%, rgba(230,57,70,0.4) 50%, transparent 100%); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s; }
+    .rating-badge { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); color: var(--gold); font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 5px; display: flex; align-items: center; gap: 4px; z-index: 2; }
+    .play-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(230,57,70,0.9) 0%, rgba(230,57,70,0.4) 50%, transparent 100%); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.25s; z-index: 2; }
     .card:hover .play-overlay { opacity: 1; }
     .play-icon { width: 52px; height: 52px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; transform: scale(0.8); transition: transform 0.2s; }
     .card:hover .play-icon { transform: scale(1); }
@@ -141,7 +177,9 @@
     .empty-state .icon { font-size: 52px; margin-bottom: 16px; display: block; }
     .empty-state p { font-size: 14px; line-height: 1.6; }
     .loading { grid-column: 1/-1; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 100px 0; color: var(--muted); font-size: 13px; }
-    .load-more { grid-column: 1/-1; display: flex; align-items: center; justify-content: center; padding: 36px 0; }
+    /* Sentinel load-more — invisible trigger untuk IntersectionObserver */
+    .load-sentinel { grid-column: 1/-1; height: 1px; }
+    .sentinel-spinner { grid-column: 1/-1; display: flex; justify-content: center; padding: 24px 0; }
     .spinner { width: 22px; height: 22px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.75s linear infinite; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -162,7 +200,6 @@
     .modal-logo span { color: var(--accent); }
     .modal-subtitle { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 28px; }
 
-    /* Tab switcher */
     .modal-tabs { display: flex; background: var(--surface); border-radius: 10px; padding: 4px; margin-bottom: 24px; gap: 4px; }
     .modal-tab {
       flex: 1; padding: 8px; border-radius: 7px; border: none; background: transparent;
@@ -171,7 +208,6 @@
     }
     .modal-tab.active { background: var(--accent); color: #fff; }
 
-    /* Form */
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
     .form-group input {
@@ -319,7 +355,71 @@
   const LIMIT = 50;
   let allMovies = [], filtered = [], page = 1, loading = false, currentSearch = "";
 
-  // ─── TOAST ───
+  /* ══════════════════════════════════════════
+     INTERSECTION OBSERVERS
+     ══════════════════════════════════════════ */
+
+  // 1. Observer untuk animasi fade-in per card (Netflix-style stagger)
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const card = entry.target;
+        // Stagger ringan berdasarkan posisi di-batch, bukan index global
+        const siblings = Array.from(card.parentElement.querySelectorAll(".card:not(.in-view)"));
+        const idx      = siblings.indexOf(card);
+        const delay    = Math.min(idx * 40, 240); // max 240ms stagger
+        setTimeout(() => card.classList.add("in-view"), delay);
+        cardObserver.unobserve(card);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: "0px 0px 40px 0px" });
+
+  // 2. Observer untuk lazy-load gambar (mulai decode 300px sebelum masuk viewport)
+  const imgObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const img = entry.target;
+      const src = img.dataset.src;
+      if (!src) { imgObserver.unobserve(img); return; }
+
+      img.src = src;
+      img.removeAttribute("data-src");
+
+      // Tandai poster sebagai ready agar shimmer hilang saat gambar selesai
+      img.addEventListener("load",  () => {
+        img.classList.add("loaded");
+        img.closest(".card-poster")?.classList.add("img-ready");
+      }, { once: true });
+      img.addEventListener("error", () => {
+        const poster = img.closest(".card-poster");
+        if (poster) { poster.innerHTML = '<div class="no-poster">🎬</div>'; }
+      }, { once: true });
+
+      imgObserver.unobserve(img);
+    });
+  }, { rootMargin: "300px 0px" }); // Pre-load 300px sebelum masuk layar
+
+  // 3. Observer untuk load-more sentinel (ganti scroll-event polling)
+  let sentinelObserver = null;
+
+  function attachSentinelObserver() {
+    if (sentinelObserver) sentinelObserver.disconnect();
+    const sentinel = document.querySelector(".load-sentinel");
+    if (!sentinel) return;
+
+    sentinelObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !loading) {
+        const hasMore = (page - 1) * LIMIT < filtered.length;
+        if (hasMore) renderPage();
+      }
+    }, { rootMargin: "400px 0px" }); // Trigger 400px sebelum sentinel kelihatan
+
+    sentinelObserver.observe(sentinel);
+  }
+
+  /* ══════════════════════════════════════════
+     TOAST
+     ══════════════════════════════════════════ */
   let toastTimer;
   function showToast(msg, type = "info") {
     const t = document.getElementById("toast");
@@ -330,7 +430,9 @@
     toastTimer = setTimeout(() => t.className = "", 3000);
   }
 
-  // ─── MODAL ───
+  /* ══════════════════════════════════════════
+     MODAL
+     ══════════════════════════════════════════ */
   function openModal() {
     document.getElementById("modal-overlay").classList.add("open");
     setTimeout(() => document.getElementById("login-username").focus(), 300);
@@ -350,7 +452,9 @@
     document.getElementById("reg-error").textContent   = "";
   }
 
-  // ─── AUTH ───
+  /* ══════════════════════════════════════════
+     AUTH
+     ══════════════════════════════════════════ */
   async function doLogin() {
     const username = document.getElementById("login-username").value.trim();
     const password = document.getElementById("login-password").value;
@@ -432,7 +536,9 @@
       </div>`;
   }
 
-  // ─── MOVIES ───
+  /* ══════════════════════════════════════════
+     MOVIES — FETCH
+     ══════════════════════════════════════════ */
   async function checkAuth() {
     try {
       const res = await fetch("/api/auth/me");
@@ -482,32 +588,52 @@
     loading = false;
   }
 
+  /* ══════════════════════════════════════════
+     RENDER PAGE — DocumentFragment + Observers
+     ══════════════════════════════════════════ */
   function renderPage(reset = false) {
     const grid = document.getElementById("movie-grid");
-    const oldLoader = grid.querySelector(".load-more");
-    if (oldLoader) oldLoader.remove();
-    if (reset) grid.innerHTML = "";
-    if (!filtered.length && reset) {
-      grid.innerHTML = `<div class="empty-state"><span class="icon">🎬</span><p>Tidak ada film ditemukan untuk<br><strong>"${currentSearch}"</strong></p></div>`;
-      document.getElementById("stat-showing").textContent = "0";
-      return;
+
+    // Bersihkan sentinel & spinner lama
+    grid.querySelector(".load-sentinel")?.remove();
+    grid.querySelector(".sentinel-spinner")?.remove();
+
+    if (reset) {
+      grid.innerHTML = "";
+      if (!filtered.length) {
+        grid.innerHTML = `<div class="empty-state"><span class="icon">🎬</span>
+          <p>Tidak ada film ditemukan untuk<br><strong>"${currentSearch}"</strong></p></div>`;
+        document.getElementById("stat-showing").textContent = "0";
+        return;
+      }
     }
+
     const start = (page - 1) * LIMIT;
     const slice = filtered.slice(start, start + LIMIT);
-    slice.forEach((m, i) => {
+    const frag  = document.createDocumentFragment(); // Batch insert — 1x reflow
+
+    slice.forEach(m => {
       const a = document.createElement("a");
       a.className = "card";
-      a.href = m.player_url; a.target = "_blank"; a.rel = "noopener noreferrer";
-      a.style.animationDelay = Math.min(i * 25, 500) + "ms";
+      a.href      = m.player_url;
+      a.target    = "_blank";
+      a.rel       = "noopener noreferrer";
+
       let badgeClass = "badge-default";
       if (m.quality) {
         const q = m.quality.toUpperCase();
-        if (q==="HD"||q==="1080P"||q==="720P") badgeClass = "badge-hd";
-        else if (q.includes("CAM")||q==="TS") badgeClass = "badge-cam";
+        if (q === "HD" || q === "1080P" || q === "720P") badgeClass = "badge-hd";
+        else if (q.includes("CAM") || q === "TS")        badgeClass = "badge-cam";
       }
+
+      // Poster: pakai data-src agar imgObserver yang handle load-nya
+      const posterHTML = m.poster
+        ? `<img data-src="${m.poster}" alt="${escHtml(m.title)}">`
+        : `<div class="no-poster">🎬</div>`;
+
       a.innerHTML = `
         <div class="card-poster">
-          ${m.poster ? `<img src="${m.poster}" alt="${escHtml(m.title)}" loading="lazy" onerror="this.parentElement.innerHTML='<div class=no-poster>🎬</div>'">` : '<div class="no-poster">🎬</div>'}
+          ${posterHTML}
           ${m.quality ? `<div class="badge ${badgeClass}">${m.quality}</div>` : ""}
           ${m.rating  ? `<div class="rating-badge">★ ${m.rating}</div>` : ""}
           <div class="play-overlay"><div class="play-icon">▶</div></div>
@@ -515,23 +641,46 @@
         <div class="card-body">
           <div class="card-title">${escHtml(m.title)}</div>
           <div class="card-meta">
-            ${m.year ? `<span>${m.year}</span>` : ""}
+            ${m.year     ? `<span>${m.year}</span>` : ""}
             ${m.year && m.duration ? '<span style="opacity:.4">·</span>' : ""}
             ${m.duration ? `<span>${m.duration}</span>` : ""}
           </div>
         </div>`;
-      grid.appendChild(a);
+
+      frag.appendChild(a);
     });
-    if (start + LIMIT < filtered.length) {
-      const loader = document.createElement("div");
-      loader.className = "load-more";
-      loader.innerHTML = '<div class="spinner"></div>';
-      grid.appendChild(loader);
+
+    // Sentinel load-more (invisible div yang di-observe)
+    const hasMore = start + LIMIT < filtered.length;
+    if (hasMore) {
+      const sentinel = document.createElement("div");
+      sentinel.className = "load-sentinel";
+      frag.appendChild(sentinel);
+
+      // Spinner kecil di bawah grid saat loading lebih
+      const spinnerWrap = document.createElement("div");
+      spinnerWrap.className = "sentinel-spinner";
+      spinnerWrap.innerHTML = '<div class="spinner"></div>';
+      frag.appendChild(spinnerWrap);
     }
+
+    grid.appendChild(frag); // ← Satu kali append ke DOM
     page++;
-    document.getElementById("stat-showing").textContent = Math.min((page-1)*LIMIT, filtered.length);
+
+    document.getElementById("stat-showing").textContent =
+      Math.min((page - 1) * LIMIT, filtered.length);
+
+    // Observe semua card & gambar baru
+    grid.querySelectorAll(".card:not(.in-view)").forEach(c => cardObserver.observe(c));
+    grid.querySelectorAll("img[data-src]").forEach(img => imgObserver.observe(img));
+
+    // Pasang sentinel observer untuk trigger load-more berikutnya
+    if (hasMore) attachSentinelObserver();
   }
 
+  /* ══════════════════════════════════════════
+     SEARCH & FILTER
+     ══════════════════════════════════════════ */
   let searchTimer;
   function filterMovies() {
     clearTimeout(searchTimer);
@@ -539,16 +688,21 @@
     document.getElementById("search-clear").classList.toggle("visible", val.length > 0);
     searchTimer = setTimeout(() => {
       currentSearch = val.toLowerCase().trim();
-      filtered = currentSearch ? allMovies.filter(m => m.title.toLowerCase().includes(currentSearch)) : allMovies;
-      page = 1; renderPage(true);
-      document.getElementById("section-label").textContent = currentSearch ? `Hasil: "${currentSearch}"` : "Semua Film";
+      filtered = currentSearch
+        ? allMovies.filter(m => m.title.toLowerCase().includes(currentSearch))
+        : allMovies;
+      page = 1;
+      renderPage(true);
+      document.getElementById("section-label").textContent =
+        currentSearch ? `Hasil: "${currentSearch}"` : "Semua Film";
     }, 300);
   }
 
   function clearSearch() {
     document.getElementById("search").value = "";
     document.getElementById("search-clear").classList.remove("visible");
-    currentSearch = ""; filtered = allMovies; page = 1; renderPage(true);
+    currentSearch = ""; filtered = allMovies; page = 1;
+    renderPage(true);
     document.getElementById("section-label").textContent = "Semua Film";
     document.getElementById("search").focus();
   }
@@ -558,31 +712,43 @@
     return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   }
 
+  /* ══════════════════════════════════════════
+     SCROLL — hanya untuk tombol scroll-to-top
+     (load-more sudah pakai IntersectionObserver)
+     ══════════════════════════════════════════ */
   window.addEventListener("scroll", () => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !loading)
-      if ((page-1)*LIMIT < filtered.length) renderPage();
-    document.getElementById("scroll-top").classList.toggle("visible", window.scrollY > 600);
-  });
+    document.getElementById("scroll-top")
+      .classList.toggle("visible", window.scrollY > 600);
+  }, { passive: true });
 
+  /* ══════════════════════════════════════════
+     KEYBOARD SHORTCUTS
+     ══════════════════════════════════════════ */
   document.addEventListener("keydown", e => {
-    if ((e.ctrlKey||e.metaKey) && e.key==="k") { e.preventDefault(); document.getElementById("search").focus(); }
-    if (e.key==="Escape") {
+    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      e.preventDefault();
+      document.getElementById("search").focus();
+    }
+    if (e.key === "Escape") {
       if (document.getElementById("modal-overlay").classList.contains("open")) closeModal();
-      else if (document.activeElement===document.getElementById("search")) clearSearch();
+      else if (document.activeElement === document.getElementById("search")) clearSearch();
     }
   });
 
-  // ─── INIT ───
+  /* ══════════════════════════════════════════
+     INIT
+     ══════════════════════════════════════════ */
   checkAuth().then(ok => {
     if (ok) loadMovies();
     else showAuthPrompt();
   });
+
+  // Auto-refresh setiap 30 menit
   setInterval(() => { if (allMovies.length) loadMovies(true); }, 30 * 60 * 1000);
 </script>
 
-
   <amp-auto-ads type="adsense"
         data-ad-client="ca-pub-1296306359438663">
-</amp-auto-ads>
+  </amp-auto-ads>
 </body>
 </html>
