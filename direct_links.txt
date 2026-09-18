@@ -1,5 +1,5 @@
 DAFTAR FILM LANGSUNG (Auto Update)
-Last update: 2026-09-18 16:44:59
+Last update: 2026-09-18 21:15:09
 Total: 796 film
 ================================================================================
 
@@ -271,7 +271,7 @@ Total: 796 film
 [The Eyes](https://fairtradeprinciples.org/the-eyes?player=1)
 [Evil Dead Burn](https://fairtradeprinciples.org/evil-dead-burn-2?player=1)
 [Pinocchio: Unstrung](https://fairtradeprinciples.org/pinocchio-unstrung?player=1)
-[Cold Storage](https://fairtradeprinciples.org/cold-storage-2?player=1)
+[Cold Storage](https://fairtradeprinciples.org/cold-storage-2?player=3)
 [Unknown Title](https://fairtradeprinciples.org/director/ali-cherkaoui?player=3)
 [The Devil’s Mouth](https://fairtradeprinciples.org/the-devils-mouth?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/jeff-wadlow?player=3)
