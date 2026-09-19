@@ -1,6 +1,6 @@
 DAFTAR FILM LANGSUNG (Auto Update)
-Last update: 2026-09-19 04:22:52
-Total: 798 film
+Last update: 2026-09-19 11:11:04
+Total: 800 film
 ================================================================================
 
 [Unknown Title](https://fairtradeprinciples.org/action?player=3)
@@ -714,9 +714,9 @@ Total: 798 film
 [Unknown Title](https://fairtradeprinciples.org/quality/hdcam?player=3)
 [Hotel Sakura](https://fairtradeprinciples.org/hotel-sakura?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/krishto-d-alam?player=3)
+[Misteri Rumah Darah](https://fairtradeprinciples.org/misteri-rumah-darah?player=1)
 [He’s Watching You](https://fairtradeprinciples.org/hes-watching-you?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/jordon-foss?player=3)
-[Misteri Rumah Darah](https://fairtradeprinciples.org/misteri-rumah-darah?player=1)
 [Tastes of Horror](https://fairtradeprinciples.org/tastes-of-horror?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/ahn-sang-hoon?player=3)
 [Killer Whale](https://fairtradeprinciples.org/killer-whale-2?player=1)
@@ -727,15 +727,14 @@ Total: 798 film
 [Unknown Title](https://fairtradeprinciples.org/director/alexander-witt?player=3)
 [Final Destination 2](https://fairtradeprinciples.org/final-destination-2?player=1)
 [Janur Ireng](https://fairtradeprinciples.org/janur-ireng?player=1)
-[Ivanna](https://fairtradeprinciples.org/ivanna?player=1)
 [Selepas Tahlil](https://fairtradeprinciples.org/selepas-tahlil?player=1)
 [The Blade Cuts Deeper](https://fairtradeprinciples.org/the-blade-cuts-deeper?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/gene-dolders?player=3)
-[We Bury the Dead](https://fairtradeprinciples.org/we-bury-the-dead?player=1)
-[Unknown Title](https://fairtradeprinciples.org/director/zak-hilditch?player=3)
+[Death Name](https://fairtradeprinciples.org/death-name?player=1)
+[Unknown Title](https://fairtradeprinciples.org/director/rei?player=3)
 [Iblis Dalam Kandungan 2: Deception](https://fairtradeprinciples.org/iblis-dalam-kandungan-2-deception?player=1)
 [Iblis Dalam Kandungan](https://fairtradeprinciples.org/iblis-dalam-kandungan?player=1)
-[Final Destination](https://fairtradeprinciples.org/final-destination?player=1)
+[Ivanna](https://fairtradeprinciples.org/ivanna?player=1)
 [The Cursed Land](https://fairtradeprinciples.org/the-cursed-land?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/panu-aree?player=3)
 [The Confession](https://fairtradeprinciples.org/the-confession?player=1)
@@ -753,6 +752,7 @@ Total: 798 film
 [Unknown Title](https://fairtradeprinciples.org/director/samuel-van-grinsven?player=3)
 [The Grieving](https://fairtradeprinciples.org/the-grieving?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/alessandro-antonaci?player=3)
+[Final Destination](https://fairtradeprinciples.org/final-destination?player=1)
 [Strange Harvest](https://fairtradeprinciples.org/strange-harvest?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/stuart-ortiz?player=3)
 [The Vindicator](https://fairtradeprinciples.org/the-vindicator?player=1)
@@ -781,6 +781,8 @@ Total: 798 film
 [Rita](https://fairtradeprinciples.org/rita-2?player=1)
 [Unknown Title](https://fairtradeprinciples.org/country/guatemala?player=3)
 [Unknown Title](https://fairtradeprinciples.org/director/jayro-bustamante?player=3)
+[Detective Dee: The Other Shore Flower](https://fairtradeprinciples.org/detective-dee-the-other-shore-flower?player=1)
+[Satan’s Slaves 2: Communion](https://fairtradeprinciples.org/satans-slaves-2-communion?player=1)
 [Primate](https://fairtradeprinciples.org/primate?player=1)
 [Unknown Title](https://fairtradeprinciples.org/director/johannes-roberts?player=3)
 [Offering](https://fairtradeprinciples.org/offering?player=1)
