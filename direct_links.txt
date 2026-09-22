@@ -1,5 +1,5 @@
 DAFTAR FILM LANGSUNG (Auto Update)
-Last update: 2026-09-20 21:12:53
+Last update: 2026-09-22 11:52:10
 Total: 798 film
 ================================================================================
 
@@ -799,5 +799,5 @@ Total: 798 film
 [Unknown Title](https://communityclimatecentre.org/director/matthew-m-howe?player=3)
 [Salem Witch Doll](https://communityclimatecentre.org/salem-witch-doll?player=1)
 [Unknown Title](https://communityclimatecentre.org/director/daniel-yates?player=3)
-[Hantu Telur Kampung](https://communityclimatecentre.org/hantu-telur-kampung?player=3)
+[Hantu Telur Kampung](https://communityclimatecentre.org/hantu-telur-kampung?player=1)
 [Unknown Title](https://communityclimatecentre.org/director/mohd-jailani?player=3)
