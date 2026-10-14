@@ -1,5 +1,5 @@
 DAFTAR FILM LANGSUNG (Auto Update)
-Last update: 2026-10-14 06:34:30
+Last update: 2026-10-14 14:27:03
 Total: 2371 film
 ================================================================================
 
@@ -1775,6 +1775,8 @@ Total: 2371 film
 [Nonton Film K.O. lk21 (2025)](https://film21.lk21.in.net/nonton-film-k-o-lk21-2025?player=3)
 [Unknown Title](https://film21.lk21.in.net/director/antoine-blossier?player=3)
 [Unknown Title](https://www.youtube.com/watch?v=7ECPKBH88No?player=3)
+[MIDA-812](https://film21.lk21.in.net/mida-812?player=3)
+[MIDA-809](https://film21.lk21.in.net/mida-809?player=3)
 [MIDA-797](https://film21.lk21.in.net/mida-797?player=3)
 [IPZZ-977](https://film21.lk21.in.net/ipzz-977?player=3)
 [IPZZ-950](https://film21.lk21.in.net/ipzz-950?player=3)
@@ -1862,8 +1864,6 @@ Total: 2371 film
 [scop-726](https://film21.lk21.in.net/scop-726?player=3)
 [START-638](https://film21.lk21.in.net/start-638?player=3)
 [START-634](https://film21.lk21.in.net/start-634?player=3)
-[SDDE-768](https://film21.lk21.in.net/sdde-768?player=3)
-[ssis-069](https://film21.lk21.in.net/ssis-069?player=3)
 [Unknown Title](https://txolarre.org/action?player=3)
 [Unknown Title](https://txolarre.org/adventure?player=3)
 [Unknown Title](https://txolarre.org/comedy?player=3)
